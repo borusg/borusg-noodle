@@ -59,8 +59,8 @@ class noodle (
   $es_repo_version         = '5.x',
   $es_instance_name        = 'noodle',
   $es_restart_on_change    = true,
-  $es_java_xmx             = '-Xmx128m',
-  $es_java_xms             = '-Xms64m',
+  $es_java_xmx             = '-Xmx64m',
+  $es_java_xms             = '-Xms32m',
   #
   # If manage_ruby is false, this module assumes you have done what's
   # required to make the ruby::bundle class work :)
@@ -140,5 +140,16 @@ class noodle (
     user      => $noodle_user,
     group     => $noodle_group,
     creates   => "${noodle_dir}/.bundle/config",
+  }
+
+  file{"${noodle_install_dir}/noodle.systemd":
+    content => template('noodle/systemd.erb')
+  } ->
+  ::systemd::unit_file { 'noodle.service':
+    source => "${noodle_install_dir}/noodle.systemd",
+  } ->
+  service{ 'noodle':
+    ensure => 'running',
+    enable => true,
   }
 }

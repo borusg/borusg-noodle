@@ -11,7 +11,8 @@
     {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"},
     {"name":"elastic/elasticsearch", "version_requirement": ">= 5.1.0" },
     {"name":"puppetlabs/vcsrepo", "version_requirement": ">= 1.5.0" },
-    {"name":"puppetlabs/ruby", "version_requirement": ">= 0.6.0" }
+    {"name":"puppetlabs/ruby", "version_requirement": ">= 0.6.0" },
+    {"name":"camptocamp/systemd", "version_requirement": ">= 0.4.0" }
   ],
   "data_provider": null
 }
