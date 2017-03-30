@@ -1,7 +1,7 @@
 # Class: noodle
 # ===========================
 #
-# Full description of class noodle here.
+# Install Noodle and its dependencies
 #
 # Parameters
 # ----------
@@ -35,14 +35,110 @@
 # Authors
 # -------
 #
-# Author Name <author@domain.com>
+# Mark Plaksin <happy@mcplaksin.org>
 #
 # Copyright
 # ---------
 #
-# Copyright 2017 Your name here, unless otherwise noted.
+# Copyright 2017 Mark Plaksin, unless otherwise noted.
 #
-class noodle {
+class noodle (
+  $noodle_install_dir      = '/usr/local/noodle',
+  $noodle_user             = 'noodle',
+  $noodle_group            = 'noodle',
+  $noodle_repo             = 'https://github.com/happymcplaksin/noodle.git',
+  $noodle_revision         = 'master',
+  $noodle_environment      = 'production',
+  #
+  $manage_es               = true,
+  $es_hostname             = 'localhost',
+  $es_port                 = 9200,
+  $es_install_java         = true,
+  $es_manage_repo          = true,
+  $es_java_package         = undef,
+  $es_repo_version         = '5.x',
+  $es_instance_name        = 'noodle',
+  $es_restart_on_change    = true,
+  $es_java_xmx             = '-Xmx128m',
+  $es_java_xms             = '-Xms64m',
+  #
+  # If manage_ruby is false, this module assumes you have done what's
+  # required to make the ruby::bundle class work :)
+  $manage_ruby             = true,
+  $ruby_version            = undef,
+  $rubygems_update         = false,
+  $ruby_package            = undef,
+  $rubygems_package        = undef,
+  $rubydev_ensure          = 'installed',
+  $rubydev_packages        = undef,
+  $rubydev_rake_ensure     = 'installed',
+  $rubydev_rake_package    = undef,
+  $rubydev_bundler_ensure  = 'installed',
+  $rubydev_bundler_package = undef,
+) {
 
+  if ($manage_es == true) {
+    class { 'elasticsearch':
+      java_install      => $es_install_java,
+      java_package      => $es_java_package,
+      manage_repo       => $es_manage_repo,
+      repo_version      => $es_repo_version,
+      restart_on_change => $es_restart_on_change,
+      jvm_options       => [$es_java_xmx,$es_java_xms],
+    }
+    elasticsearch::instance { $es_instance_name: }
+  }
 
+  if ($manage_ruby == true) {
+    class { 'ruby':
+      version          => $ruby_version,
+      ruby_package     => $ruby_package,
+      rubygems_package => $rubygems_package,
+      rubygems_update  => $rubygems_update,
+
+    }
+    class { 'ruby::dev':
+      ensure            => $rubydev_ensure,
+      ruby_dev_packages => $rubydev_packages,
+      rake_ensure       => $rubydev_rake_ensure,
+      rake_package      => $rubydev_rake_package,
+      bundler_ensure    => $rubydev_bundler_ensure,
+      bundler_package   => $rubydev_bundler_package,
+    }
+  }
+
+  # Make group and user
+  group{$noodle_group:
+    ensure => 'present',
+    system => true,
+  } ->
+  user{$noodle_user:
+    ensure => 'present',
+    home   => $noodle_install_dir,
+    system => true,
+  } ->
+  file{ $noodle_install_dir:
+    ensure => 'directory',
+    owner  => $noodle_user,
+    group  => $noodle_group,
+  } ->
+  # Fetch the code
+  vcsrepo {$noodle_install_dir:
+    ensure   => 'present',
+    provider => 'git',
+    source   => $noodle_repo,
+    user     => $noodle_user,
+    group    => $noodle_group,
+    revision => $noodle_revision,
+  } ->
+  # Install dependencies
+  ruby::bundle{'noodle':
+    command   => 'install',
+    option    => '--path=vendor/bundle',
+    cwd       => $noodle_install_dir,
+    rails_env => $noodle_environment,
+    user      => $noodle_user,
+    group     => $noodle_group,
+    creates   => "${noodle_dir}/.bundle/config",
+  }
 }
