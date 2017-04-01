@@ -1,0 +1,18 @@
+[Unit]
+Description=no description given
+
+[Service]
+Type=simple
+User=<%= @noodle_user %>
+Group=<%= @noodle_group %>
+# Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.
+# Prefixing the path with '-' makes it try to load, but if the file doesn't
+# exist, it continues onward.
+EnvironmentFile=-/etc/default/noodle
+EnvironmentFile=-/etc/sysconfig/noodle
+ExecStart=/usr/local/bin/bundle "exec" "rackup"
+Restart=always
+WorkingDirectory=<%= @noodle_install_dir %>
+
+[Install]
+WantedBy=multi-user.target
