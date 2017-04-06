@@ -1,0 +1,15 @@
+---
+version: 5
+hierarchy:
+  - name: "Noodle"
+    lookup_key: noodle_lookup_key
+    options:
+      hostname: "%{facts.hostname}"
+  - name: "Per-node data"                   # Human-readable name.
+    path: "nodes/%{facts.hostname}.yaml"  # File path, relative to datadir.
+  - name: Common
+    path: common.yaml
+defaults:
+  data_hash: yaml_data
+  datadir: data
+
