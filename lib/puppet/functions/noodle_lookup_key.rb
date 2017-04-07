@@ -9,15 +9,12 @@ Puppet::Functions.create_function(:noodle_lookup_key) do
   end
 
   def noodle_lookup_key(key,options,context)
-    # TODO: Why is key always 'lookup_key' instead of something like 'ntp_servers'?!?
-    # For now force looking up the 'site' param below.
-    # puts "key is #{key}."
-    #
-    # TODO: hostname should really be FQDN:
-    value = Noodle.paramvalue(options['hostname'],'site')
+    # Ahem, we have no lookup_options (yet)
+    context.not_found if key == 'lookup_options'
+
+    value = Noodle.paramvalue(options['hostname'],key)
     context.not_found if value.nil? or value.empty?
-    # TODO: This fails unless it's a hash? Grok that.
-    return {'value' => value}
+    return value
   end
 end
 
