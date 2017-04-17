@@ -80,6 +80,10 @@ class noodle (
   $kibana_manage_repo      = true,
   $kibana_version          = 'latest',
   $kibana_port             = '5601',
+  # Want Grafana with that?
+  $manage_grafana          = true,
+  $grafana_manage_repo     = true,
+  $grafana_version         = 'latest',
 ) {
   # Make group and user
   group{$noodle_group:
@@ -134,6 +138,13 @@ class noodle (
       config          => {
         'server.port' => $kibana_port,
       }
+    }
+  }
+
+  if ($manage_grafana == true) {
+    class { 'grafana':
+      manage_package_repo => $grafana_manage_repo,
+      version             => $grafana_version,
     }
   }
 
