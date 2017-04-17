@@ -81,46 +81,6 @@ class noodle (
   $kibana_version          = 'latest',
   $kibana_port             = '5601',
 ) {
-  if ($manage_kibana == true) {
-    class { 'kibana':
-      ensure          => $kibana_version,
-      manage_repo     => $kibana_manage_repo,
-      config          => {
-        'server.port' => $kibana_port,
-      }
-    }
-  }
-
-  if ($manage_es == true) {
-    class { 'elasticsearch':
-      java_install      => $es_install_java,
-      java_package      => $es_java_package,
-      manage_repo       => $es_manage_repo,
-      repo_version      => $es_repo_version,
-      restart_on_change => $es_restart_on_change,
-      jvm_options       => [$es_java_xmx,$es_java_xms],
-    }
-    elasticsearch::instance { $es_instance_name: }
-  }
-
-  if ($manage_ruby == true) {
-    class { 'ruby':
-      version          => $ruby_version,
-      ruby_package     => $ruby_package,
-      rubygems_package => $rubygems_package,
-      rubygems_update  => $rubygems_update,
-
-    }
-    class { 'ruby::dev':
-      ensure            => $rubydev_ensure,
-      ruby_dev_packages => $rubydev_packages,
-      rake_ensure       => $rubydev_rake_ensure,
-      rake_package      => $rubydev_rake_package,
-      bundler_ensure    => $rubydev_bundler_ensure,
-      bundler_package   => $rubydev_bundler_package,
-    }
-  }
-
   # Make group and user
   group{$noodle_group:
     ensure => 'present',
@@ -165,5 +125,45 @@ class noodle (
   service{ 'noodle':
     ensure => 'running',
     enable => true,
+  }
+
+  if ($manage_kibana == true) {
+    class { 'kibana':
+      ensure          => $kibana_version,
+      manage_repo     => $kibana_manage_repo,
+      config          => {
+        'server.port' => $kibana_port,
+      }
+    }
+  }
+
+  if ($manage_es == true) {
+    class { 'elasticsearch':
+      java_install      => $es_install_java,
+      java_package      => $es_java_package,
+      manage_repo       => $es_manage_repo,
+      repo_version      => $es_repo_version,
+      restart_on_change => $es_restart_on_change,
+      jvm_options       => [$es_java_xmx,$es_java_xms],
+    }
+    elasticsearch::instance { $es_instance_name: }
+  }
+
+  if ($manage_ruby == true) {
+    class { 'ruby':
+      version          => $ruby_version,
+      ruby_package     => $ruby_package,
+      rubygems_package => $rubygems_package,
+      rubygems_update  => $rubygems_update,
+
+    }
+    class { 'ruby::dev':
+      ensure            => $rubydev_ensure,
+      ruby_dev_packages => $rubydev_packages,
+      rake_ensure       => $rubydev_rake_ensure,
+      rake_package      => $rubydev_rake_package,
+      bundler_ensure    => $rubydev_bundler_ensure,
+      bundler_package   => $rubydev_bundler_package,
+    }
   }
 }
