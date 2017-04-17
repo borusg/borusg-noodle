@@ -75,7 +75,21 @@ class noodle (
   $rubydev_rake_package    = undef,
   $rubydev_bundler_ensure  = 'installed',
   $rubydev_bundler_package = undef,
+  # Want Kibana with that?
+  $manage_kibana           = true,
+  $kibana_manage_repo      = true,
+  $kibana_version          = 'latest',
+  $kibana_port             = '5601',
 ) {
+  if ($manage_kibana == true) {
+    class { 'kibana':
+      ensure          => $kibana_version,
+      manage_repo     => $kibana_manage_repo,
+      config          => {
+        'server.port' => $kibana_port,
+      }
+    }
+  }
 
   if ($manage_es == true) {
     class { 'elasticsearch':
