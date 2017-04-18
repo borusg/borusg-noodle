@@ -84,7 +84,7 @@ class noodle (
   # Want Grafana with that?
   $manage_grafana          = true,
   $grafana_manage_repo     = true,
-  $grafana_version         = 'latest',
+  $grafana_version         = '4.2.0',
 ) {
   # Make group and user
   group{$noodle_group:
