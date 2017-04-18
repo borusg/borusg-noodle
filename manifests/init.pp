@@ -79,6 +79,7 @@ class noodle (
   $manage_kibana           = true,
   $kibana_manage_repo      = true,
   $kibana_version          = 'latest',
+  $kibana_host             = $::fqdn,
   $kibana_port             = '5601',
   # Want Grafana with that?
   $manage_grafana          = true,
@@ -136,6 +137,7 @@ class noodle (
       ensure          => $kibana_version,
       manage_repo     => $kibana_manage_repo,
       config          => {
+        'server.host' => $kibana_host,
         'server.port' => $kibana_port,
       }
     }
